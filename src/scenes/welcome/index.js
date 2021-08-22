@@ -1,9 +1,10 @@
 import React from 'react';
-import {View,Text} from 'react-native';
+import {View,Text,Button} from 'react-native';
 
-const Welcome = () => (
+const Welcome = ({ navigation }) => (
     <View>
         <Text>Welcome</Text>
+        <Button title="skip" onPress={() => navigation.navigate('Dashboard')}/>
     </View>
 );
 

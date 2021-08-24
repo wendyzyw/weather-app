@@ -5,12 +5,13 @@ import {
     Text,
     StyleSheet,
     TouchableHighlight,
-    ScrollView,
+    ScrollView, Pressable,
 } from 'react-native';
 import {ListItem, Avatar, Button, SearchBar} from 'react-native-elements';
 import config from '../../assets/config.json';
 import cityListJson from '../../assets/city.list.json';
 import Modal from "react-native-modal";
+import Detail from "../detail";
 
 const Dashboard = ({navigation}) => {
     const cityList = [
@@ -36,7 +37,6 @@ const Dashboard = ({navigation}) => {
     const [filteredList, setFilteredList] = useState([]);
 
     const searchFilter = (event, text) => {
-        console.log("filter");
         const data = cityListJson.filter( city => {
             const cityName = city.name.toUpperCase();
             const typedName = text.toUpperCase();
@@ -44,6 +44,17 @@ const Dashboard = ({navigation}) => {
         });
         console.log(data);
         setFilteredList(data);
+    }
+
+    const addCity = (id, name) => {
+        const query = config.API_CALL_WEATHER_CITY_ID + '?id=' + id + '&units=metric&appid=' + config.API_KEY;
+        fetch(query)
+            .then( res => res.json() )
+            .then( data => {
+                setWeather({cityList: [...weather.cityList, {id: id, name: name, temperature: data.main.temp}]});
+            })
+            .catch( error => console.log(error) );
+        clearModalStates();
     }
 
     const clearModalStates = () => {
@@ -86,10 +97,12 @@ const Dashboard = ({navigation}) => {
                             onChangeText={(search) => setSearch(search)}
                             onSubmitEditing={(event) => searchFilter(event, search)}
                             value={search}
+                            onClear={() => setFilteredList([])}
                         />
                         <ScrollView style={{flexGrow: 1, maxHeight: 400}}>
+                            {filteredList.length === 0 && <Text>No city found.</Text>}
                             {filteredList.map((item,i) =>
-                                <ListItem key={i}>
+                                <ListItem key={i} onPress={() => addCity(item.id, item.name)}>
                                     <ListItem.Title>{item.name}</ListItem.Title>
                                     <ListItem.Subtitle>{item.country}</ListItem.Subtitle>
                                 </ListItem>
@@ -101,10 +114,9 @@ const Dashboard = ({navigation}) => {
             <TouchableHighlight>
                 <View>
                     {weather.cityList.map( (city, index) => (
-                        <ListItem key={index}>
+                        <ListItem key={index} onPress={() => navigation.navigate('Detail')}>
                             <View style={{display: 'flex', flex:1, flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <View>
-                                <Text>{city.name}</Text></View>
+                                <View><Text>{city.name}</Text></View>
                                 <View><Text>{city.temperature}</Text></View>
                             </View>
                         </ListItem>

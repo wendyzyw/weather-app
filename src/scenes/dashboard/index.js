@@ -114,7 +114,7 @@ const Dashboard = ({navigation}) => {
             <TouchableHighlight>
                 <View>
                     {weather.cityList.map( (city, index) => (
-                        <ListItem key={index} onPress={() => navigation.navigate('Detail')}>
+                        <ListItem key={index} onPress={() => navigation.navigate('Detail', {cityId: city.id})}>
                             <View style={{display: 'flex', flex:1, flexDirection: 'row', justifyContent: 'space-between'}}>
                                 <View><Text>{city.name}</Text></View>
                                 <View><Text>{city.temperature}</Text></View>

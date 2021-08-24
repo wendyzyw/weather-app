@@ -63,7 +63,7 @@ const Dashboard = ({navigation}) => {
         setFilteredList([]);
     }
 
-    useEffect( () => {
+    const fetchAllCityWeatherData = () => {
         // api.openweathermap.org/data/2.5/weather?id={city id}&appid={API key}
         Promise.all( cityList.map(city => {
             const query = config.API_CALL_WEATHER_CITY_ID + '?id=' + city.id + '&units=metric&appid=' + config.API_KEY;
@@ -74,6 +74,17 @@ const Dashboard = ({navigation}) => {
                 setWeather({cityList: cityList});
             })
             .catch(error => console.log(error));
+    }
+
+    useEffect( () => {
+        // query weather api every 1 minute
+        const id = setInterval( () => {
+            console.log("Updating");
+            fetchAllCityWeatherData();
+        }, 60000 );
+
+        fetchAllCityWeatherData();
+        return () => clearInterval(id);
     }, [] );
 
     return (

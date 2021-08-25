@@ -12,6 +12,7 @@ import config from '../../assets/config.json';
 import cityListJson from '../../assets/city.list.json';
 import Modal from "react-native-modal";
 import Detail from "../detail";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const imageBackgroundSrc = '../../assets/background.jpg';
 
@@ -53,7 +54,8 @@ const Dashboard = ({navigation}) => {
         fetch(query)
             .then( res => res.json() )
             .then( data => {
-                setWeather({cityList: [...weather.cityList, {id: id, name: name, temperature: data.main.temp}]});
+                setWeather({cityList: [...weather.cityList, {id: id, name: name, temperature: data.main.temp,
+                        icon: config.ICON_URL_PREFIX + data.weather[0].icon + config.ICON_URL_POSTFIX}]});
             })
             .catch( error => console.log(error) );
         clearModalStates();
@@ -72,7 +74,10 @@ const Dashboard = ({navigation}) => {
             return fetch(query).then(res => res.json());
         }) )
             .then(data => {
-                cityList.map((city, i) => city.temperature = data[i].main.temp);
+                cityList.map((city, i) => {
+                    city.temperature = data[i].main.temp;
+                    city.icon = config.ICON_URL_PREFIX + data[i].weather[0].icon + config.ICON_URL_POSTFIX;
+                });
                 setWeather({cityList: cityList});
             })
             .catch(error => console.log(error));
@@ -103,7 +108,7 @@ const Dashboard = ({navigation}) => {
                 >
                     <View contentContainerStyle={styles.centeredView}>
                         <View style={styles.modalView}>
-                            <Text>Find a city</Text>
+                            <Text style={{color: '#353B63', fontSize: 25, fontWeight: 'bold'}}>Find a city</Text>
                             <SearchBar
                                 platform='android'
                                 placeholder="Type Here..."
@@ -113,7 +118,7 @@ const Dashboard = ({navigation}) => {
                                 onClear={() => setFilteredList([])}
                             />
                             <ScrollView style={styles.searchAreaScrollViewStyle}>
-                                {filteredList.length === 0 && <Text>No city found.</Text>}
+                                {filteredList.length === 0 && <Text style={{color: '#A892B0', fontSize: 18, fontWeight: 'bold', alignSelf: 'center'}}>No city found.</Text>}
                                 {filteredList.map((item,i) =>
                                     <ListItem key={i} onPress={() => addCity(item.id, item.name)}>
                                         <ListItem.Title>{item.name}</ListItem.Title>
@@ -124,21 +129,29 @@ const Dashboard = ({navigation}) => {
                         </View>
                     </View>
                 </Modal>
+                <View style={{marginTop: 20}}>
                     {weather.cityList.map( (city, index) => (
                         <TouchableOpacity key={index}  onPress={() => navigation.navigate('Detail', {cityId: city.id})}>
                             <ListItem containerStyle={styles.listItemContainerStyle}>
+                                <View style={{backgroundColor: 'rgba(255, 255, 255, 0.5)', borderRadius: 10, padding: 10}}>
+                                    <Avatar source={{uri: city.icon}} />
+                                </View>
                                 <View style={styles.listItemWrapperStyle} onPress={() => navigation.navigate('Detail', {cityId: city.id})}>
-                                    <Text>{city.name}</Text>
-                                    <Text>{city.temperature}</Text>
+                                    <Text style={{color: '#353B63', fontSize: 18, fontWeight: 'bold'}}>{city.name}</Text>
+                                    <Text style={{color: '#A892B0', fontSize: 25, fontWeight: 'bold'}}>{city.temperature}°</Text>
                                 </View>
                             </ListItem>
                         </TouchableOpacity>
                     ))}
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
                         <ListItem containerStyle={styles.listItemContainerStyle}>
-                            <Button title='Add more cities' onPress={() => setModalVisible(!modalVisible)} />
+                            <View style={{backgroundColor: 'rgba(255, 255, 255, 0.5)', borderRadius: 10, padding: 10}}>
+                                <Icon name="plus-square" size={30} color="#9A27FF" />
+                            </View>
+                            <Text style={{color: '#A892B0', fontSize: 18, fontWeight: 'bold'}}>Add more cities</Text>
                         </ListItem>
                     </TouchableOpacity>
+                </View>
             </SafeAreaView>
         </ImageBackground>
 
@@ -178,9 +191,9 @@ const styles = StyleSheet.create({
     listItemContainerStyle: {
         backgroundColor: 'rgba(255, 255, 255, 0.4)',
         marginHorizontal: 20,
-        marginVertical: 10,
-        padding: 25,
-        borderRadius: 15
+        marginVertical: 8,
+        padding: 17,
+        borderRadius: 10
     },
     listItemWrapperStyle: {
         display: 'flex',

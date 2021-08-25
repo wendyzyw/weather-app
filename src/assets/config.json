@@ -1,4 +1,6 @@
 {
   "API_KEY": "fdf792e7c64fe7d90da16794724eab1d",
-  "API_CALL_WEATHER_CITY_ID": "http://api.openweathermap.org/data/2.5/weather"
+  "API_CALL_WEATHER_CITY_ID": "http://api.openweathermap.org/data/2.5/weather",
+  "ICON_URL_PREFIX": "http://openweathermap.org/img/wn/",
+  "ICON_URL_POSTFIX": "@2x.png"
 }

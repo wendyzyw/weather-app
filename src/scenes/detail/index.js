@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, SafeAreaView, ScrollView, ImageBackground, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, SafeAreaView, ScrollView, ImageBackground, TouchableOpacity, Text} from 'react-native';
 import config from "../../assets/config.json";
-import {Card} from "react-native-elements";
+import {Avatar, Card} from "react-native-elements";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const initialData = {
     profile: {
@@ -10,7 +11,7 @@ const initialData = {
         feelsLike: '',
         summary: '',
         description: '',
-        iconCode: ''
+        iconUri: ''
     },
     measurements: {
         wind: '',
@@ -19,6 +20,16 @@ const initialData = {
         max: ''
     }
 }
+
+const weatherInfoCard = ( iconName, titleName, data, leftPositioned ) => (
+    <Card containerStyle={leftPositioned ? styles.cardContainerLeftStyle : styles.cardContainerRightStyle}>
+        <Icon name={iconName} size={25} color="#353B63" style={{width: 25}}/>
+        <View style={styles.cardTextWrapperStyle}>
+            <Card.Title style={styles.cardTitleStyle}>{titleName}</Card.Title>
+            <Card.FeaturedSubtitle style={styles.cardSubtitleStyle}>{data}</Card.FeaturedSubtitle>
+        </View>
+    </Card>
+);
 
 const Detail = ({ route, navigation }) => {
     const { cityId } = route.params;
@@ -37,7 +48,7 @@ const Detail = ({ route, navigation }) => {
                         feelsLike: data.main.feels_like,
                         summary: data.weather[0].main,
                         description: data.weather[0].description,
-                        iconCode: data.weather[0].icon
+                        iconUri: config.ICON_URL_PREFIX + data.weather[0].icon + config.ICON_URL_POSTFIX
                     },
                     measurements: {
                         wind: data.wind.speed,
@@ -56,35 +67,21 @@ const Detail = ({ route, navigation }) => {
             <ScrollView>
                 <View>
                     <TouchableOpacity>
-                        <Card containerStyle={{flex: 1,
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            marginVertical: 10,
-                            padding: 25,
-                            elevation: 0,
-                            borderRadius: 15,
-                            borderWidth: 0}}>
-                            <Card.Title>{weatherData.profile.description}</Card.Title>
+                        <Card containerStyle={styles.profileContainerStyle}>
+                            <Card.Title style={styles.profileTitleStyle}>{weatherData.profile.name}</Card.Title>
+                            <Avatar source={{uri: weatherData.profile.iconUri}} size='xlarge' iconStyle={{flex: 1, textAlignVertical: 'center'}}/>
+                            <Card.Title style={{color: '#353B63', fontSize: 50, fontWeight: 'bold'}}>{weatherData.profile.temperate}°</Card.Title>
+                            <Card.Title style={styles.profileTextStyle}>{weatherData.profile.summary}, feels like {weatherData.profile.feelsLike}°</Card.Title>
+                            <Card.Title style={styles.profileTextStyle}>{weatherData.profile.description}</Card.Title>
                         </Card>
                     </TouchableOpacity>
                     <View style={{flex: 1, flexDirection: 'row'}}>
-                        <Card containerStyle={styles.cardContainerLeftStyle} >
-                            <Card.Title>Wind</Card.Title>
-                            <Card.FeaturedSubtitle style={{alignSelf: 'center'}}>{weatherData.measurements.wind}</Card.FeaturedSubtitle>
-                        </Card>
-                        <Card containerStyle={styles.cardContainerRightStyle}>
-                            <Card.Title>Humidity</Card.Title>
-                            <Card.FeaturedSubtitle style={{alignSelf: 'center'}}>{weatherData.measurements.humidity}</Card.FeaturedSubtitle>
-                        </Card>
+                        {weatherInfoCard('tint', 'Wind', weatherData.measurements.wind, true)}
+                        {weatherInfoCard('tint', 'Humidity', weatherData.measurements.humidity, false)}
                     </View>
                     <View style={{flex: 1, flexDirection: 'row'}}>
-                        <Card containerStyle={styles.cardContainerLeftStyle}>
-                            <Card.Title>Min temperature</Card.Title>
-                            <Card.FeaturedSubtitle style={{alignSelf: 'center'}}>{weatherData.measurements.min}</Card.FeaturedSubtitle>
-                        </Card>
-                        <Card containerStyle={styles.cardContainerRightStyle}>
-                            <Card.Title>Max temperature</Card.Title>
-                            <Card.FeaturedSubtitle style={{alignSelf: 'center'}}>{weatherData.measurements.max}</Card.FeaturedSubtitle>
-                        </Card>
+                        {weatherInfoCard('thermometer', 'Min °C', weatherData.measurements.min, true)}
+                        {weatherInfoCard('thermometer', 'Max °C', weatherData.measurements.max, false)}
                     </View>
                 </View>
             </ScrollView>
@@ -94,6 +91,29 @@ const Detail = ({ route, navigation }) => {
 }
 
 const styles = StyleSheet.create({
+    profileContainerStyle: {
+        flex: 1,
+        backgroundColor: 'transparent',
+        marginVertical: 10,
+        elevation: 0,
+        borderWidth: 0,
+        flexDirection: 'column',
+        alignItems: 'center'
+    },
+    profileTitleStyle:{
+        color: '#353B63',
+        fontWeight: 'bold',
+        fontSize: 18,
+        marginBottom: 0,
+        textAlign: 'center'
+    },
+    profileTextStyle:{
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 14,
+        marginBottom: 0,
+        textAlign: 'center'
+    },
     cardContainerLeftStyle: {
         flex: 1,
         marginRight: 7.5,
@@ -102,7 +122,9 @@ const styles = StyleSheet.create({
         padding: 25,
         elevation: 0,
         borderRadius: 15,
-        borderWidth: 0
+        borderWidth: 0,
+        justifyContent: 'flex-start',
+        flexDirection: 'row'
     },
     cardContainerRightStyle: {
         flex: 1,
@@ -112,8 +134,28 @@ const styles = StyleSheet.create({
         padding: 25,
         elevation: 0,
         borderRadius: 15,
-        borderWidth: 0
+        borderWidth: 0,
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
     },
+    cardTextWrapperStyle: {
+        flex: 1,
+        marginLeft: 35,
+        marginTop: -30
+    },
+    cardTitleStyle:{
+        color: '#A892B0',
+        fontWeight: 'bold',
+        fontSize: 14,
+        marginBottom: 0,
+        alignSelf: 'flex-start'
+    },
+    cardSubtitleStyle: {
+        alignSelf: 'flex-start',
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 0
+    }
 });
 
 export default Detail;

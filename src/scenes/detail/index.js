@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, Button, SafeAreaView, ScrollView} from 'react-native';
+import {View, Text, Button, SafeAreaView, ScrollView, ImageBackground} from 'react-native';
 import config from "../../assets/config.json";
 import {Card} from "react-native-elements";
 
@@ -51,6 +51,7 @@ const Detail = ({ route, navigation }) => {
     } , [] );
 
     return (
+        <ImageBackground source={require('../../assets/background.jpg')} resizeMode='cover' style={{flex: 1, height: '100%'}} >
         <SafeAreaView>
             <ScrollView>
                 <View>
@@ -76,6 +77,7 @@ const Detail = ({ route, navigation }) => {
                 </View>
             </ScrollView>
         </SafeAreaView>
+        </ImageBackground>
     );
 }
 
